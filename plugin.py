@@ -19,25 +19,28 @@ email                : brush.tyler@gmail.com
  *                                                                         *
  ***************************************************************************/
 """
+from __future__ import absolute_import
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from builtins import object
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 
 from qgis.core import *
 from qgis.gui import *
 
-import resources_rc
+from . import resources_rc
 
-class RTQSpiderPlugin:
+class RTQSpiderPlugin(object):
     def __init__(self, iface):
         self.iface = iface
 
     def initGui(self):
         self.action = QAction(QIcon(":/rt_qspider/icons/logo"), "Table to vector converter", self.iface.mainWindow())
-        QObject.connect(self.action, SIGNAL("triggered()"), self.run)
+        self.action.triggered.connect(self.run)
 
         self.aboutAction = QAction( QIcon( ":/rt_qspider/icons/about" ), "About", self.iface.mainWindow() )
-        QObject.connect( self.aboutAction, SIGNAL("triggered()"), self.about )
+        self.aboutAction.triggered.connect(self.about)
 
         self.iface.addToolBarIcon(self.action)
         self.iface.addPluginToMenu("RT QSpider", self.action)

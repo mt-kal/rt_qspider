@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from __future__ import absolute_import
+from builtins import str
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 
 from .ui.DlgAbout_ui import Ui_DlgAbout
 from rt_qspider import name, description, version
@@ -10,7 +13,7 @@ import platform
 try:
 	import resources
 except ImportError:
-	import resources_rc
+	from . import resources_rc
 
 class DlgAbout(QDialog, Ui_DlgAbout):
 
@@ -39,8 +42,8 @@ Platform: %s - %s
 		mail.addQueryItem( "subject", subject )
 		mail.addQueryItem( "body", body )
 
-		text = text.replace( "$MAIL_SUBJECT$", unicode(mail.encodedQueryItemValue( "subject" )) )
-		text = text.replace( "$MAIL_BODY$", unicode(mail.encodedQueryItemValue( "body" )) )
+		text = text.replace( "$MAIL_SUBJECT$", str(mail.encodedQueryItemValue( "subject" )) )
+		text = text.replace( "$MAIL_BODY$", str(mail.encodedQueryItemValue( "body" )) )
 
 		self.txt.setHtml(text)
 

@@ -20,8 +20,9 @@ email                : brush.tyler@gmail.com
  ***************************************************************************/
 """
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 
 from qgis.core import *
 from qgis.gui import *
@@ -41,7 +42,7 @@ class RTQSpiderDlg(QDialog, Ui_RTQSpiderDlg):
         self.crsEdit.setText( "EPSG:4326" )
         self.populateCombos()
 
-        QObject.connect(self.selectCrsBtn, SIGNAL("clicked()"), self.selectCrs)
+        self.selectCrsBtn.clicked.connect(self.selectCrs)
 
     def selectCrs(self):
         dlg = CRSDialog( "Select the CRS", self )
@@ -50,7 +51,7 @@ class RTQSpiderDlg(QDialog, Ui_RTQSpiderDlg):
 
     def populateCombos(self):
         # populate the geometry type combo
-        for val, name in {QGis.WKBPoint:"Point", QGis.WKBLineString:"Line"}.iteritems():
+        for val, name in {QgsWkbTypes.Point:"Point", QgsWkbTypes.LineString:"Line"}.items():
             self.geomTypeCombo.addItem(name, val)
 
         # populate the fields combos with numeric fields
@@ -67,7 +68,7 @@ class RTQSpiderDlg(QDialog, Ui_RTQSpiderDlg):
         mode = self.geomTypeCombo.itemData( self.geomTypeCombo.currentIndex() )
 
         # check whether required values was filled
-        if mode == QGis.WKBPoint:
+        if mode == QgsWkbTypes.Point:
             if self.xPointCombo.currentIndex() < 0 or \
                     self.yPointCombo.currentIndex() < 0:
                 return
@@ -77,7 +78,7 @@ class RTQSpiderDlg(QDialog, Ui_RTQSpiderDlg):
                # robusness check: this block of code should never be reached
                raise ValueError("invalid field index found...")
 
-        elif mode == QGis.WKBLineString:
+        elif mode == QgsWkbTypes.LineString:
             if self.x1LineCombo.currentIndex() < 0 or \
                     self.y1LineCombo.currentIndex() < 0 or \
                     self.x2LineCombo.currentIndex() < 0 or \
@@ -94,7 +95,7 @@ class RTQSpiderDlg(QDialog, Ui_RTQSpiderDlg):
         # let's ask for a output shapefile path
         settings = QSettings()
         lastDir = settings.value("/rt_qspider/lastUsedDir", "", type=str)
-        filename = QFileDialog.getSaveFileName(self, 
+        filename, __ = QFileDialog.getSaveFileName(self, 
                 "Choose where to save the output shapefile", lastDir, 
                 "Shapefile (*.shp)")
         if filename == "":
@@ -105,8 +106,12 @@ class RTQSpiderDlg(QDialog, Ui_RTQSpiderDlg):
 
         # create the vector file writer
         # TODO: allow user to choose encoding
-        writer = QgsVectorFileWriter(filename, "System", self.vl.dataProvider().fields(), 
-                mode, self.getCrs(), "ESRI Shapefile")
+        transform_context = QgsProject.instance().transformContext()
+        save_options = QgsVectorFileWriter.SaveVectorOptions()
+        save_options.driverName = "ESRI Shapefile"
+        save_options.fileEncoding = "UTF-8"
+        writer = QgsVectorFileWriter.create(filename, self.vl.dataProvider().fields(), 
+                mode, self.getCrs(), transform_context, save_options)
         if writer.hasError() != QgsVectorFileWriter.NoError:
             QMessageBox.warning(self, "RT QSpider", 
                 u"Failed to create the output shapefile '%s' due to the following error:\n%s" % (filename, writer.errorMessage()))
@@ -126,11 +131,11 @@ class RTQSpiderDlg(QDialog, Ui_RTQSpiderDlg):
                 y1d =  float(y1d_toconv)
             except:
                 continue
-            p1 = QgsPoint(x1d, y1d)
-            if mode == QGis.WKBPoint:
-                geom = QgsGeometry.fromPoint(p1)
+            p1 = QgsPointXY(x1d, y1d)
+            if mode == QgsWkbTypes.Point:
+                geom = QgsGeometry.fromPointXY(p1)
 
-            elif mode == QGis.WKBLineString:
+            elif mode == QgsWkbTypes.LineString:
                 x2d_toconv = feat[x2]
                 y2d_toconv = feat[y2]
                 try:
@@ -138,7 +143,7 @@ class RTQSpiderDlg(QDialog, Ui_RTQSpiderDlg):
                     y2d =  float(y2d_toconv)
                 except:
                     continue
-                p2 = QgsPoint(x2d, y2d)
+                p2 = QgsPointXY(x2d, y2d)
                 geom = QgsGeometry.fromPolyline( [p1, p2] )
 
             feat.setGeometry(geom)

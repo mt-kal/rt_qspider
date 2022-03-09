@@ -11,10 +11,10 @@ ui: $(UI_FILES)
 resources: $(RC_FILES)
 
 $(UI_FILES): %_ui.py: %.ui
-	pyuic4 -o $@ $<
+	pyuic5 -o $@ $<
 	
 $(RC_FILES): %_rc.py: %.qrc
-	pyrcc4 -o $@ $<
+	pyrcc5 -o $@ $<
 
 
 clean:

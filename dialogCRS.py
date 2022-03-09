@@ -16,6 +16,7 @@
 *                                                                         *
 ***************************************************************************
 """
+from builtins import str
 import qgis
 
 __author__ = 'Giuseppe Sucameli'
@@ -24,8 +25,9 @@ __copyright__ = '(C) 2010, Giuseppe Sucameli'
 # This will get replaced with a git SHA1 when you do a git archive
 __revision__ = '$Format:%H$'
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 from qgis.core import *
 from qgis.gui import *
 
@@ -42,8 +44,8 @@ class CRSDialog(QDialog):
       layout.addWidget(buttonBox)
       self.setLayout(layout)
 
-      self.connect(buttonBox, SIGNAL("accepted()"), self.accept)
-      self.connect(buttonBox, SIGNAL("rejected()"), self.reject)
+      buttonBox.accepted.connect(self.accept)
+      buttonBox.rejected.connect(self.reject)
 
   def authId(self):
       return str(self.selector.selectedAuthId())
