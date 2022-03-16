@@ -3,7 +3,7 @@
 name=RT QSpider
 description=Convert the selected table to an event layer (based on an X,Y pair) or to a spider diagram (based on two X,Y pairs)
 version=0.4.1
-qgisMinimumVersion=3.20
+qgisMinimumVersion=3.0
 
 ; not used yet, will allow to put a plugin in the right menu
 category=Plugin

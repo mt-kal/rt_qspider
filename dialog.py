@@ -131,11 +131,13 @@ class RTQSpiderDlg(QDialog, Ui_RTQSpiderDlg):
                 y1d =  float(y1d_toconv)
             except:
                 continue
-            p1 = QgsPointXY(x1d, y1d)
+
             if mode == QgsWkbTypes.Point:
+                p1 = QgsPointXY(x1d, y1d)
                 geom = QgsGeometry.fromPointXY(p1)
 
             elif mode == QgsWkbTypes.LineString:
+                p1 = QgsPoint(x1d, y1d)
                 x2d_toconv = feat[x2]
                 y2d_toconv = feat[y2]
                 try:
@@ -143,7 +145,7 @@ class RTQSpiderDlg(QDialog, Ui_RTQSpiderDlg):
                     y2d =  float(y2d_toconv)
                 except:
                     continue
-                p2 = QgsPointXY(x2d, y2d)
+                p2 = QgsPoint(x2d, y2d)
                 geom = QgsGeometry.fromPolyline( [p1, p2] )
 
             feat.setGeometry(geom)
